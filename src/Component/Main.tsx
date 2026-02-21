@@ -1,43 +1,31 @@
-// import React from "react";
-// import SideBar from "./SideBar";
-
-// const Main = () => {
-//   return (
-//     <div className="flex flex-row h-screen">
-//       <div className="w-20/100 h-full bg-BackgroundPrimary">
-//         <SideBar />
-//       </div>
-//       <div className=" w-25/100 h-full bg-BackgroundSecondary text-textColor">
-//         check
-//       </div>
-//       <div className=" w-55/100 h-full bg-BackgroundPrimary text-textColor">
-//         Whyy
-//       </div>
-//     </div>
-//   );
-// };
-
-// export default Main;
-
+import FilesList from "./FilesList";
 import SideBar from "./SideBar";
 
-const Main: React.FC = () => {
+const Main = () => {
   return (
-    <div className="flex h-screen overflow-hidden">
-      {/* Sidebar */}
-      <div className="basis-1/5 bg-BackgroundPrimary min-h-0">
+    <div className="h-screen flex overflow-hidden bg-primary text-primary">
+      <div
+        className="shrink-0 border-r"
+        style={{
+          width: "var(--sidebar-width)",
+          borderColor: "var(--border-color)",
+        }}
+      >
         <SideBar />
       </div>
 
-      {/* Middle panel */}
-      <div className="basis-1/4 bg-BackgroundSecondary text-textColor min-h-0">
-        check
+      <div
+        className="shrink-0 border-r overflow-y-auto  bg-secondary"
+        style={{
+          width: "var(--middle-width)",
+          backgroundColor: "var(--bg-secondary)",
+          borderColor: "var(--border-color)",
+        }}
+      >
+        <FilesList />
       </div>
 
-      {/* Editor panel */}
-      <div className="flex-1 bg-BackgroundPrimary text-textColor min-h-0">
-        Whyy
-      </div>
+      <div className="flex-1 overflow-y-auto p-10">Whyy</div>
     </div>
   );
 };

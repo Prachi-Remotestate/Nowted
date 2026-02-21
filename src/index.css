@@ -1,12 +1,100 @@
-
-@import url("https://fonts.googleapis.com/css2?family=Kaushan+Script&family=Spline+Sans&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Kaushan+Script&family=Spline+Sans:wght@400;500;600;700&display=swap");
 @import "tailwindcss";
 
-@theme {
-  --color-BackgroundPrimary: #181818;
-  --color-textColor: #FFF; 
-  --color-BackgroundSecondary: #1C1C1C;
-  --font-kaushan: "Kaushan Script"
+/* FULL HEIGHT RESET */
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  font-family: var(--font-primary);
+}
+
+/* ===== DARK THEME DEFAULT ===== */
+:root {
+  --bg-primary: #181818;
+  --bg-secondary: #1C1C1C;
+  --bg-hover: #242424;
+
+  --text-primary: #ffffff;
+  --text-secondary: #9CA3AF;
+  
+  --border-color: #2A2A2A;
+  --accent: #6366F1;
+
+  --sidebar-width: clamp(220px, 18vw, 300px);
+  --middle-width: clamp(260px, 22vw, 350px);
+
+  /* FONT VARIABLES */
+  --font-primary: "Spline Sans", sans-serif;
+  --font-logo: "Kaushan Script";
+}
+
+/* ===== LIGHT THEME ===== */
+.light {
+  --bg-primary: #ffffff;
+  --bg-secondary: #F5F5F5;
+  --bg-hover: #EAEAEA;
+
+  --text-primary: #111827;
+  --text-secondary: #6B7280;
+
+  --border-color: #E5E7EB;
+  --accent: #6366F1;
+
+  /* same fonts, but could change if you want */
+  --font-primary: "Spline Sans", sans-serif;
+  --font-logo: "Kaushan Script";
+}
 
 
+/* ===== BACKGROUND UTILITIES ===== */
+.bg-primary {
+  background-color: var(--bg-primary);
+}
+
+.bg-secondary {
+  background-color: var(--bg-secondary);
+}
+
+.bg-hover:hover {
+  background-color: var(--bg-hover);
+}
+
+/* ===== TEXT UTILITIES ===== */
+.text-primary {
+  color: var(--text-primary);
+}
+
+.text-secondary {
+  color: var(--text-secondary);
+}
+
+.text-accent {
+  color: var(--accent);
+}
+
+/* ===== FONT UTILITIES ===== */
+.font-primary {
+  font-family: var(--font-primary);
+}
+
+.font-logo {
+  font-family: var(--font-logo);
+}
+
+/* ===== LAYOUT UTILITIES ===== */
+.sidebar {
+  width: var(--sidebar-width);
+}
+
+.middle-panel {
+  width: var(--middle-width);
+}
+
+.border-theme {
+  border-color: var(--border-color);
 }

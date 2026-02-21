@@ -1,105 +1,164 @@
-import React from "react";
-import pencil from "../assets/pencil.svg";
-import search from "../assets/search.png";
-import Folder from "../assets/folder.png";
-type RecentNote = {
-  id: number;
-  title: string;
-  active?: boolean;
-};
-
-type Folder = {
-  id: number;
-  name: string;
-};
-
+import { useTheme } from "../hooks/useTheme";
+import { Pen } from "lucide-react";
+import { Search } from "lucide-react";
+import { FolderPlus } from "lucide-react";
+import { Folder } from "lucide-react";
+import { FileText } from "lucide-react";
+import { Star } from "lucide-react";
+import { Archive } from "lucide-react";
+import { Trash } from "lucide-react";
+import { FolderOpen } from "lucide-react";
 const SideBar = () => {
-  const recents: RecentNote[] = [
+  const { theme, setTheme } = useTheme();
+
+  const recents = [
     { id: 1, title: "Reflection on the Month of June", active: true },
     { id: 2, title: "Project proposal" },
     { id: 3, title: "Travel itinerary" },
   ];
 
-  const folders: Folder[] = [
-    { id: 1, name: "Personal" },
-    { id: 2, name: "Work" },
-    { id: 3, name: "Travel" },
-    { id: 4, name: "Events" },
-    { id: 5, name: "Finances" },
-    { id: 6, name: "Ideas" },
-    { id: 7, name: "Learning" },
+  const folders = [
+    "Personal",
+    "Work",
+    "Travel",
+    "Events",
+    "Finances",
+    "Ideas",
+    "Learning",
   ];
 
   return (
-    <aside className="flex flex-col h-full w-full px-4 pt-4 pb-9 bg-BackgroundPrimary text-textColor">
-      <div className="flex items-center justify-between mb-6">
-        <div className="flex items-center gap-2">
-          <h1 className="font-kaushan text-xl leading-none">Nowted</h1>
-          <img src={pencil} alt="edit" className="w-3.5 h-3.5" />
+    <aside
+      className="h-full flex flex-col bg-primary text-primary"
+      style={{
+        padding: "var(--sidebar-padding-y) var(--sidebar-padding-x)",
+      }}
+    >
+      <div className="flex items-center justify-between mb-8 pt-4">
+        <div className="flex items-center gap-2 pl-3 ">
+          <h1 className="text-xl font-semibold tracking-tight font-logo">
+            Nowted
+          </h1>
+
+          <Pen
+            size={16}
+            strokeWidth={1.8}
+            className="text-secondary hover:text-primary transition-colors cursor-pointer"
+          />
         </div>
 
-        <button>
-          <img src={search} alt="search" className="w-4 h-4" />
-        </button>
+        <Search
+          size={18}
+          strokeWidth={1.8}
+          className="text-secondary hover:text-primary transition-colors cursor-pointer mr-4  "
+        />
       </div>
 
-      <button className="w-full bg-BackgroundSecondary py-2 rounded-md mb-6 text-sm hover:opacity-90 transition">
+      <button
+        className="w-full py-2.5 rounded-md text-sm font-medium transition mb-8"
+        style={{
+          backgroundColor: "var(--bg-secondary)",
+        }}
+      >
         + New Note
       </button>
 
-      <section className="mb-6">
-        <h2 className="text-xs opacity-60 mb-3">Recents</h2>
+      <section className="mb-8">
+        <h2 className="text-xs uppercase tracking-wider mb-4 text-secondary pl-4">
+          Recents
+        </h2>
 
-        <div className="flex flex-col gap-2">
+        <div className="flex flex-col gap-1 pl-5">
           {recents.map((note) => (
             <button
               key={note.id}
-              className={`w-full text-left px-3 py-2 rounded-md text-sm transition
-              whitespace-nowrap overflow-hidden text-ellipsis
-              ${
-                note.active
-                  ? "bg-indigo-600 text-white"
-                  : "hover:bg-BackgroundSecondary"
-              }`}
+              className="flex items-center gap-3 px-3 py-2 rounded-md text-sm text-left transition"
+              style={{
+                backgroundColor: note.active ? "var(--accent)" : "transparent",
+              }}
+              onMouseEnter={(e) => {
+                if (!note.active)
+                  e.currentTarget.style.backgroundColor = "var(--bg-hover)";
+              }}
+              onMouseLeave={(e) => {
+                if (!note.active)
+                  e.currentTarget.style.backgroundColor = "transparent";
+              }}
             >
-              {note.title}
+              <FileText
+                size={16}
+                strokeWidth={1.8}
+                className="text-secondary hover:text-primary transition-colors cursor-pointer"
+              />
+              <span className="truncate">{note.title}</span>
             </button>
           ))}
         </div>
       </section>
 
       <section className="flex flex-col mb-6">
-        <h2 className="text-xs opacity-60 mb-3">Folders</h2>
+        <div className="flex justify-between items-center mb-4">
+          <h2 className="text-xs uppercase tracking-wider text-secondary pl-4">
+            Folders
+          </h2>
+          <FolderPlus
+            size={18}
+            strokeWidth={1.8}
+            className="text-secondary hover:text-primary transition-colors cursor-pointer mr-4"
+          />
+        </div>
 
-        <div className="flex flex-col gap-2 max-h-[200px] overflow-y-auto pr-1">
-          {folders.map((folder) => (
+        <div className="flex flex-col gap-1 overflow-y-auto max-h-[200px] pr-1 pl-5">
+          {folders.map((folder, index) => (
             <button
-              key={folder.id}
-              className="flex items-center gap-2 text-sm px-2 py-1.5 rounded-md w-full text-left hover:bg-BackgroundSecondary transition"
+              key={index}
+              className="flex items-center gap-3 px-3 py-2 rounded-md text-sm text-left transition"
+              onMouseEnter={(e) =>
+                (e.currentTarget.style.backgroundColor = "var(--bg-hover)")
+              }
+              onMouseLeave={(e) =>
+                (e.currentTarget.style.backgroundColor = "transparent")
+              }
             >
-              <img src={Folder} /> {folder.name}
+              <Folder
+                size={18}
+                strokeWidth={1.8}
+                className="text-secondary hover:text-primary transition-colors cursor-pointer"
+              />
+              {folder}
             </button>
           ))}
         </div>
       </section>
-
-      <section>
-        <h2 className="text-xs opacity-60 mb-3">More</h2>
-
-        <div className="flex flex-col gap-2">
-          <button className="text-sm text-left px-2 py-1.5 rounded-md hover:bg-BackgroundSecondary transition">
-            ⭐ Favorites
+      <div className="pt-6 ">
+        {" "}
+        <h2 className="text-xs uppercase tracking-wider mb-3 text-secondary pl-4">
+          {" "}
+          More{" "}
+        </h2>
+        <div className="flex flex-col gap-1 pl-5">
+          <button className="flex items-center gap-3 px-3 py-2 rounded-md text-sm text-secondary hover:bg-hover hover:text-primary transition">
+            <Star size={16} strokeWidth={1.8} />
+            Favorites
           </button>
 
-          <button className="text-sm text-left px-2 py-1.5 rounded-md hover:bg-BackgroundSecondary transition">
-            🗑 Trash
+          <button className="flex items-center gap-3 px-3 py-2 rounded-md text-sm text-secondary hover:bg-hover hover:text-primary transition">
+            <Trash size={16} strokeWidth={1.8} />
+            Trash
           </button>
 
-          <button className="text-sm text-left px-2 py-1.5 rounded-md hover:bg-BackgroundSecondary transition">
-            📦 Archived Notes
+          <button className="flex items-center gap-3 px-3 py-2 rounded-md text-sm text-secondary hover:bg-hover hover:text-primary transition">
+            <Archive size={16} strokeWidth={1.8} />
+            Archived Notes
           </button>
         </div>
-      </section>
+      </div>
+      <button
+        onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+        className="text-xs opacity-60 hover:opacity-100 transition"
+      >
+        {theme === "dark" ? "Light" : "Dark"}
+      </button>
     </aside>
   );
 };
