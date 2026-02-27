@@ -1,15 +1,17 @@
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { Routes, Route } from "react-router-dom";
 import Main from "./Component/Main";
+import { NotesProvider } from "./hooks/ContextNotes";
 
 const App = () => {
   return (
-    <BrowserRouter>
+    <NotesProvider>
       <Routes>
         <Route path="/" element={<Main />} />
         <Route path="/folders/:folderId" element={<Main />} />
         <Route path="/folders/:folderId/notes/:noteId" element={<Main />} />
+        <Route path="/notes/:noteId" element={<Main />} />
       </Routes>
-    </BrowserRouter>
+    </NotesProvider>
   );
 };
 

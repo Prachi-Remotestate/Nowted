@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import { useNotes, NotesViewType } from "../hooks/ContextNotes";
+import { useParams } from "react-router-dom";
 
 export interface Note {
   id: string;
@@ -9,57 +11,88 @@ export interface Note {
   preview: string;
 }
 
-interface FilesListProps {
-  activeFolderId: string | null;
-  activeNoteId: string | null;
-}
-const FilesList = ({ activeFolderId, activeNoteId }: FilesListProps) => {
+const FilesList = () => {
   const [notes, setNotes] = useState<Note[]>([]);
   const [loading, setLoading] = useState(false);
   const [folderName, setFolderName] = useState("");
   const navigate = useNavigate();
-  console.log(activeFolderId);
-  const fetchNotes = async (folderId: string) => {
-    try {
-      setLoading(true);
-      const url = `https://nowted-server.remotestate.com/notes?archived=false&favorite=false&deleted=false&folderId=${folderId}&page=1&limit=10`;
-
-      const res = await axios.get(url);
-      console.log(res);
-      if (Array.isArray(res.data?.notes)) {
-        setNotes(res.data.notes);
-        console.log(res.data.notes[0].folder.name);
-        setFolderName(res.data.notes[0].folder.name);
-      } else {
-        setNotes([]);
-      }
-    } catch (error) {
-      console.error("Error fetching notes:", error);
-      setNotes([]);
-    } finally {
-      setLoading(false);
-    }
-  };
-
+  const { viewType } = useNotes();
+  const { folderId, noteId } = useParams();
   useEffect(() => {
-    if (activeFolderId) {
-      fetchNotes(activeFolderId);
-    } else {
-      setNotes([]);
-    }
-  }, [activeFolderId]);
+    const fetchNotes = async () => {
+      try {
+        setLoading(true);
+
+        const params: any = {
+          archived: false,
+          favorite: false,
+          deleted: false,
+          page: 1,
+          limit: 10,
+        };
+
+        if (viewType === NotesViewType.Folder) {
+          if (!folderId) return;
+          params.folderId = folderId;
+        }
+
+        if (viewType === NotesViewType.Favorites) {
+          params.favorite = true;
+        }
+
+        if (viewType === NotesViewType.Archived) {
+          params.archived = true;
+        }
+
+        const res = await axios.get(
+          "https://nowted-server.remotestate.com/notes",
+          { params },
+        );
+
+        if (Array.isArray(res.data?.notes)) {
+          setNotes(res.data.notes);
+
+          if (res.data.notes.length > 0) {
+            setFolderName(
+              viewType === NotesViewType.Folder
+                ? res.data.notes[0].folder?.name || ""
+                : viewType === NotesViewType.Favorites
+                  ? "Favorites"
+                  : "Archived",
+            );
+          } else {
+            setFolderName(
+              viewType === NotesViewType.Folder
+                ? ""
+                : viewType === NotesViewType.Favorites
+                  ? "Favorites"
+                  : "Archived",
+            );
+          }
+        } else {
+          setNotes([]);
+        }
+      } catch (error) {
+        console.error("Error fetching notes:", error);
+        setNotes([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchNotes();
+  }, [viewType, folderId]);
 
   return (
     <div className="h-full flex flex-col text-primary">
       {/* Header */}
       <div className="px-6 py-5 border-theme">
         <h2 className="text-lg font-semibold tracking-tight">
-          {activeFolderId ? folderName : "Select a Folder"}
+          {folderName || "Select a Folder"}
         </h2>
       </div>
 
-      {/* Notes List */}
-      <div className="flex-1 overflow-y-auto px-4 py-4 space-y-3">
+      <div className="flex-1 overflow-y-scroll scrollbar-hide px-4 py-4 space-y-3">
         {loading && (
           <div className="text-sm text-secondary">Loading notes...</div>
         )}
@@ -74,11 +107,15 @@ const FilesList = ({ activeFolderId, activeNoteId }: FilesListProps) => {
           <div
             key={note.id}
             onClick={() =>
-              navigate(`/folders/${activeFolderId}/notes/${note.id}`)
+              navigate(
+                viewType === NotesViewType.Folder
+                  ? `/folders/${folderId}/notes/${note.id}`
+                  : `/notes/${note.id}`,
+              )
             }
             className={`border-theme rounded-lg p-4 cursor-pointer transition-all
     ${
-      activeNoteId === note.id
+      noteId === note.id
         ? "bg-hover border border-primary"
         : "bg-primary bg-opacity-60 hover:bg-hover"
     }
@@ -94,7 +131,7 @@ const FilesList = ({ activeFolderId, activeNoteId }: FilesListProps) => {
               </p>
 
               <p className="text-xs text-secondary line-clamp-2">
-                {note.preview}
+                {note.preview}...
               </p>
             </div>
           </div>

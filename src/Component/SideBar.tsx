@@ -13,7 +13,7 @@ import {
   Trash,
 } from "lucide-react";
 import { useNavigate, useParams } from "react-router-dom";
-
+import { useNotes, NotesViewType } from "../hooks/ContextNotes";
 interface Note {
   id: string;
   title: string;
@@ -27,7 +27,7 @@ const SideBar = () => {
   const [recents, setRecents] = useState<Note[]>([]);
   const { folderId, noteId } = useParams();
   const navigate = useNavigate();
-
+  const { setViewType, setActiveFolderId } = useNotes();
   interface FolderType {
     id: string;
     name: string;
@@ -75,7 +75,7 @@ const SideBar = () => {
 
   return (
     <aside
-      className="h-full flex flex-col bg-primary text-primary"
+      className="  flex flex-col bg-primary text-primary"
       style={{
         padding: "var(--sidebar-padding-y) var(--sidebar-padding-x)",
       }}
@@ -90,7 +90,7 @@ const SideBar = () => {
           <Pen
             size={16}
             strokeWidth={1.8}
-            className="text-secondary hover:text-primary transition-colors cursor-pointer"
+            className="text-primary  transition-colors cursor-pointer"
           />
         </div>
 
@@ -101,7 +101,6 @@ const SideBar = () => {
         />
       </div>
 
-      {/* New Note Button */}
       <button
         className="w-full py-2.5 rounded-md text-sm font-medium transition mb-8"
         style={{
@@ -166,7 +165,7 @@ const SideBar = () => {
           />
         </div>
 
-        <div className="flex flex-col gap-1 overflow-y-auto  pr-1 pl-5">
+        <div className="flex flex-col gap-1 overflow-y-scroll scrollbar-hide h-55 pr-1 pl-5">
           {folders.length === 0 && (
             <span className="text-xs text-secondary opacity-60">
               No folders
@@ -179,7 +178,10 @@ const SideBar = () => {
             return (
               <button
                 key={folder.id}
-                onClick={() => navigate(`/folders/${folder.id}`)}
+                onClick={() => {
+                  setViewType(NotesViewType.Folder);
+                  navigate(`/folders/${folder.id}`);
+                }}
                 className={`flex items-center gap-3 px-3 py-2 rounded-md text-sm text-left transition-colors
             ${
               isActive
@@ -209,13 +211,19 @@ const SideBar = () => {
         </div>
       </section>
 
-      <div className="pt-6">
+      <div className="pt-6 mt-auto">
         <h2 className="text-xs uppercase tracking-wider mb-3 text-secondary pl-4">
           More
         </h2>
 
         <div className="flex flex-col gap-1 pl-5">
-          <button className="flex items-center gap-3 px-3 py-2 rounded-md text-sm text-secondary hover:bg-hover hover:text-primary transition">
+          <button
+            className="flex items-center gap-3 px-3 py-2 rounded-md text-sm text-secondary hover:bg-hover hover:text-primary transition"
+            onClick={() => {
+              setActiveFolderId(null);
+              setViewType(NotesViewType.Favorites);
+            }}
+          >
             <Star size={16} strokeWidth={1.8} />
             Favorites
           </button>
@@ -225,7 +233,13 @@ const SideBar = () => {
             Trash
           </button>
 
-          <button className="flex items-center gap-3 px-3 py-2 rounded-md text-sm text-secondary hover:bg-hover hover:text-primary transition">
+          <button
+            className="flex items-center gap-3 px-3 py-2 rounded-md text-sm text-secondary hover:bg-hover hover:text-primary transition"
+            onClick={() => {
+              setActiveFolderId(null);
+              setViewType(NotesViewType.Archived);
+            }}
+          >
             <Archive size={16} strokeWidth={1.8} />
             Archived Notes
           </button>

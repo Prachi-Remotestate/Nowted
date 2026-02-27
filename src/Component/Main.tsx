@@ -15,9 +15,9 @@ const Main = () => {
   }, [folderId]);
 
   return (
-    <div className="h-screen flex overflow-hidden bg-primary text-primary">
+    <div className="h-screen overflow-hidden  flex  bg-primary text-primary">
       <div
-        className="shrink-0 border-r"
+        className="overflow-y-scroll scrollbar-hide shrink-0 border-r "
         style={{
           width: "var(--sidebar-width)",
           borderColor: "var(--border-color)",
@@ -34,13 +34,10 @@ const Main = () => {
           borderColor: "var(--border-color)",
         }}
       >
-        <FilesList
-          activeFolderId={activeFolderId}
-          activeNoteId={noteId || null}
-        />
+        <FilesList />
       </div>
 
-      <div className="flex-1 overflow-y-auto p-10">
+      <div className="flex-1 overflow-y-auto ">
         <Editor activeNoteId={noteId || null} />
       </div>
     </div>
