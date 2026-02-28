@@ -3,7 +3,7 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { useNotes, NotesViewType } from "../hooks/ContextNotes";
 import { useParams } from "react-router-dom";
-
+import { useRef } from "react";
 export interface Note {
   id: string;
   title: string;
@@ -15,84 +15,121 @@ const FilesList = () => {
   const [notes, setNotes] = useState<Note[]>([]);
   const [loading, setLoading] = useState(false);
   const [folderName, setFolderName] = useState("");
+  const [page, setPage] = useState(1);
+  const [hasMore, setHasMore] = useState(true);
   const navigate = useNavigate();
-  const { viewType } = useNotes();
+  const { folders, viewType } = useNotes();
   const { folderId, noteId } = useParams();
+
+  const listRef = useRef<HTMLDivElement>(null);
+  const fetchNotes = async (pageNumber: number, reset = false) => {
+    try {
+      setLoading(true);
+
+      const params: any = {
+        page: pageNumber,
+        limit: 10,
+      };
+
+      if (viewType === NotesViewType.Trash) {
+        params.deleted = true;
+      } else {
+        params.deleted = false;
+      }
+
+      if (viewType === NotesViewType.Folder) {
+        if (!folderId) return;
+        params.folderId = folderId;
+      }
+
+      if (viewType === NotesViewType.Favorites) {
+        params.favorite = true;
+      }
+
+      if (viewType === NotesViewType.Archived) {
+        params.archived = true;
+      }
+
+      const res = await axios.get(
+        "https://nowted-server.remotestate.com/notes",
+        { params },
+      );
+
+      const newNotes = res.data?.notes || [];
+
+      if (reset) {
+        setNotes(newNotes);
+      } else {
+        setNotes((prev) => [...prev, ...newNotes]);
+      }
+
+      setHasMore(newNotes.length === 10);
+    } catch (error) {
+      console.error("Error fetching notes:", error);
+      if (reset) setNotes([]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
-    const fetchNotes = async () => {
-      try {
-        setLoading(true);
+    setNotes([]);
+    setPage(1);
+    setHasMore(true);
 
-        const params: any = {
-          archived: false,
-          favorite: false,
-          deleted: false,
-          page: 1,
-          limit: 10,
-        };
+    fetchNotes(1, true);
+  }, [viewType, folderId]);
 
-        if (viewType === NotesViewType.Folder) {
-          if (!folderId) return;
-          params.folderId = folderId;
-        }
+  useEffect(() => {
+    const handleScroll = () => {
+      if (!listRef.current || loading || !hasMore) return;
 
-        if (viewType === NotesViewType.Favorites) {
-          params.favorite = true;
-        }
+      const { scrollTop, scrollHeight, clientHeight } = listRef.current;
 
-        if (viewType === NotesViewType.Archived) {
-          params.archived = true;
-        }
-
-        const res = await axios.get(
-          "https://nowted-server.remotestate.com/notes",
-          { params },
-        );
-
-        if (Array.isArray(res.data?.notes)) {
-          setNotes(res.data.notes);
-
-          if (res.data.notes.length > 0) {
-            setFolderName(
-              viewType === NotesViewType.Folder
-                ? res.data.notes[0].folder?.name || ""
-                : viewType === NotesViewType.Favorites
-                  ? "Favorites"
-                  : "Archived",
-            );
-          } else {
-            setFolderName(
-              viewType === NotesViewType.Folder
-                ? ""
-                : viewType === NotesViewType.Favorites
-                  ? "Favorites"
-                  : "Archived",
-            );
-          }
-        } else {
-          setNotes([]);
-        }
-      } catch (error) {
-        console.error("Error fetching notes:", error);
-        setNotes([]);
-      } finally {
-        setLoading(false);
+      if (scrollTop + clientHeight >= scrollHeight - 40) {
+        setPage((prevPage) => prevPage + 1);
       }
     };
 
-    fetchNotes();
-  }, [viewType, folderId]);
+    const current = listRef.current;
+    current?.addEventListener("scroll", handleScroll);
+
+    return () => {
+      current?.removeEventListener("scroll", handleScroll);
+    };
+  }, [loading, hasMore]);
+
+  useEffect(() => {
+    if (page === 1) return;
+
+    fetchNotes(page);
+  }, [page]);
+
+  useEffect(() => {
+    if (viewType === NotesViewType.Folder && folderId) {
+      const folder = folders.find((f) => f.id === folderId);
+      setFolderName(folder?.name || "");
+    } else if (viewType === NotesViewType.Favorites) {
+      setFolderName("Favorites");
+    } else if (viewType === NotesViewType.Archived) {
+      setFolderName("Archived");
+    } else if (viewType === NotesViewType.Trash) {
+      setFolderName("Trash");
+    }
+  }, [folderId, folders, viewType]);
 
   return (
     <div className="h-full flex flex-col text-primary">
-      {/* Header */}
       <div className="px-6 py-5 border-theme">
         <h2 className="text-lg font-semibold tracking-tight">
           {folderName || "Select a Folder"}
         </h2>
       </div>
 
-      <div className="flex-1 overflow-y-scroll scrollbar-hide px-4 py-4 space-y-3">
+      <div
+        ref={listRef}
+        className="flex-1 overflow-y-scroll scrollbar-hide px-4 py-4 space-y-3"
+      >
         {loading && (
           <div className="text-sm text-secondary">Loading notes...</div>
         )}
