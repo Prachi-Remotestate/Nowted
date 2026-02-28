@@ -4,15 +4,25 @@ export const NotesViewType = {
   Folder: "FOLDER",
   Favorites: "FAVORITES",
   Archived: "ARCHIVED",
+  Trash: "TRASH",
 } as const;
 
 export type NotesViewType = (typeof NotesViewType)[keyof typeof NotesViewType];
 
+export interface FolderType {
+  id: string;
+  name: string;
+}
+
 interface NotesContextType {
   viewType: NotesViewType;
   setViewType: React.Dispatch<React.SetStateAction<NotesViewType>>;
+
   activeFolderId: string | null;
   setActiveFolderId: React.Dispatch<React.SetStateAction<string | null>>;
+
+  folders: FolderType[];
+  setFolders: React.Dispatch<React.SetStateAction<FolderType[]>>;
 }
 
 const NotesContext = createContext<NotesContextType | undefined>(undefined);
@@ -20,6 +30,7 @@ const NotesContext = createContext<NotesContextType | undefined>(undefined);
 export const NotesProvider = ({ children }: { children: React.ReactNode }) => {
   const [viewType, setViewType] = useState<NotesViewType>(NotesViewType.Folder);
   const [activeFolderId, setActiveFolderId] = useState<string | null>(null);
+  const [folders, setFolders] = useState<FolderType[]>([]);
 
   return (
     <NotesContext.Provider
@@ -28,6 +39,8 @@ export const NotesProvider = ({ children }: { children: React.ReactNode }) => {
         setViewType,
         activeFolderId,
         setActiveFolderId,
+        folders,
+        setFolders,
       }}
     >
       {children}

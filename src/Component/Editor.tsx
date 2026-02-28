@@ -102,13 +102,9 @@ const Editor = ({ activeNoteId }: EditorProps) => {
 
     try {
       await axios.post(
-        `https://nowted-server.remotestate.com/folders/${note.folderId}/restore`,
-        {
-          noteId: note.id,
-        },
+        `https://nowted-server.remotestate.com/notes/${note.id}/restore`,
       );
 
-      // Refetch restored note
       await fetchNote(note.id);
     } catch (error) {
       console.error("Restore failed:", error);
@@ -232,7 +228,7 @@ const Editor = ({ activeNoteId }: EditorProps) => {
         <div className="border-b border-theme " />
         <div className="flex items-center gap-3 pb-6">
           <Folder size={16} className="text-secondary" />
-          <span className="pr-8 text-secondary">folder</span>
+          <span className="pr-6 text-secondary">folder</span>
           <span className="text-primary underline">{note.folder?.name}</span>
         </div>
       </div>
