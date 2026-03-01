@@ -10,8 +10,10 @@ export interface Note {
   createdAt: string;
   preview: string;
 }
-
-const FilesList = () => {
+interface Props {
+  searchTerm: string;
+}
+const FilesList = ({ searchTerm }: Props) => {
   const [notes, setNotes] = useState<Note[]>([]);
   const [loading, setLoading] = useState(false);
   const [folderName, setFolderName] = useState("");
@@ -50,6 +52,10 @@ const FilesList = () => {
         params.archived = true;
       }
 
+      if (debouncedSearch.trim()) {
+        params.search = debouncedSearch.trim();
+      }
+
       const res = await axios.get(
         "https://nowted-server.remotestate.com/notes",
         { params },
@@ -71,7 +77,6 @@ const FilesList = () => {
       setLoading(false);
     }
   };
-
   useEffect(() => {
     setNotes([]);
     setPage(1);
@@ -117,7 +122,18 @@ const FilesList = () => {
       setFolderName("Trash");
     }
   }, [folderId, folders, viewType]);
+  const [debouncedSearch, setDebouncedSearch] = useState("");
 
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearch(searchTerm);
+    }, 500);
+
+    return () => clearTimeout(timer);
+  }, [searchTerm]);
+  useEffect(() => {
+    fetchNotes(1, true);
+  }, [debouncedSearch, viewType, folderId]);
   return (
     <div className="h-full flex flex-col text-primary">
       <div className="px-6 py-5 border-theme">

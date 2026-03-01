@@ -1,6 +1,7 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import axios from "axios";
 import { useTheme } from "../hooks/useTheme";
+
 import {
   Pen,
   Search,
@@ -26,14 +27,32 @@ interface Note {
   isArchived?: boolean;
 }
 
-const SideBar = () => {
+interface Props {
+  isSearching: boolean;
+  setIsSearching: React.Dispatch<React.SetStateAction<boolean>>;
+  searchTerm: string;
+  setSearchTerm: React.Dispatch<React.SetStateAction<string>>;
+}
+
+const SideBar = ({
+  isSearching,
+  setIsSearching,
+  searchTerm,
+  setSearchTerm,
+}: Props) => {
   const { theme, setTheme } = useTheme();
   const [recents, setRecents] = useState<Note[]>([]);
   const [isCreatingFolder, setIsCreatingFolder] = useState(false);
 
   const { folderId, noteId } = useParams();
   const navigate = useNavigate();
-  const { setViewType, setActiveFolderId, folders, setFolders } = useNotes();
+  const {
+    setViewType,
+    setActiveFolderId,
+    folders,
+    setFolders,
+    activeFolderId,
+  } = useNotes();
 
   const fetchRecents = async () => {
     try {
@@ -86,11 +105,13 @@ const SideBar = () => {
       console.error("Failed to update folder:", error);
     }
   };
+
   const deleteFolder = async (folderId: string) => {
     await axios.delete(
       `https://nowted-server.remotestate.com/folders/${folderId}`,
     );
   };
+
   const handleDeleteFolder = async (id: string) => {
     try {
       await deleteFolder(id);
@@ -104,6 +125,36 @@ const SideBar = () => {
       }
     } catch (error) {
       console.error("Error deleting folder:", error);
+    }
+  };
+  const isCreatingRef = useRef<boolean>(false);
+
+  const handleCreateNote = async () => {
+    if (!folderId || isCreatingRef.current) return;
+
+    isCreatingRef.current = true;
+
+    try {
+      const res = await axios.post(
+        "https://nowted-server.remotestate.com/notes",
+        {
+          title: "",
+          content: "",
+          folderId,
+        },
+      );
+
+      const newNoteId = res.data?.id;
+
+      if (newNoteId) {
+        navigate(`/folders/${folderId}/notes/${newNoteId}`);
+      }
+    } catch (error) {
+      console.error("Error creating note:", error);
+    } finally {
+      setTimeout(() => {
+        isCreatingRef.current = false;
+      }, 500);
     }
   };
   const [editingFolderId, setEditingFolderId] = useState<string | null>(null);
@@ -133,17 +184,35 @@ const SideBar = () => {
           size={18}
           strokeWidth={1.8}
           className="text-secondary hover:text-primary transition-colors cursor-pointer mr-4"
+          onClick={() => {
+            setIsSearching(true);
+          }}
         />
       </div>
 
-      <button
-        className="w-full py-2.5 rounded-md text-sm font-medium transition mb-8"
-        style={{
-          backgroundColor: "var(--bg-secondary)",
-        }}
-      >
-        + New Note
-      </button>
+      {isSearching ? (
+        <input
+          autoFocus
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          onBlur={() => {
+            if (!searchTerm) setIsSearching(false);
+          }}
+          placeholder="Search notes..."
+          className="w-full py-2.5 px-3 rounded-md text-sm outline-none"
+          style={{ backgroundColor: "var(--bg-secondary)" }}
+        />
+      ) : (
+        <button
+          className={`w-full py-2.5 rounded-md text-sm font-medium transition mb-8 ${
+            !folderId ? "opacity-50 cursor-not-allowed" : "hover:opacity-90"
+          }`}
+          style={{ backgroundColor: "var(--bg-secondary)" }}
+          onClick={handleCreateNote}
+        >
+          + New Note
+        </button>
+      )}
 
       <section className="mb-8">
         <h2 className="text-xs uppercase tracking-wider mb-4 text-secondary pl-4">
@@ -276,7 +345,7 @@ const SideBar = () => {
 
                 {activeMenuId === folder.id && (
                   <div
-                    className="absolute right-2 top-9 bg-primary border border-theme rounded-md shadow-md z-20"
+                    className="right-2 top-9 bg-primary border border-theme rounded-md shadow-md z-20"
                     onClick={(e) => e.stopPropagation()}
                   >
                     <button

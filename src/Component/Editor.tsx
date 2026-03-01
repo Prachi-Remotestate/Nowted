@@ -19,6 +19,13 @@ const Editor = ({ activeNoteId }: EditorProps) => {
   const [note, setNote] = useState<any>(null);
   const [loading, setLoading] = useState(false);
   const [menu, setMenu] = useState(false);
+  const [initialContent, setInitialContent] = useState("");
+  const [title, setTitle] = useState("");
+  const [content, setContent] = useState("");
+  const [initialData, setInitialData] = useState({
+    title: "",
+    content: "",
+  });
   console.log(activeNoteId);
   const fetchNote = async (noteId: string) => {
     try {
@@ -28,7 +35,16 @@ const Editor = ({ activeNoteId }: EditorProps) => {
         `https://nowted-server.remotestate.com/notes/${noteId}`,
       );
       console.log(res.data);
-      setNote(res.data?.note);
+      const fetchedNote = res.data?.note;
+      setNote(fetchedNote);
+
+      setTitle(fetchedNote?.title || "");
+      setContent(fetchedNote?.content || "");
+
+      setInitialData({
+        title: fetchedNote?.title || "",
+        content: fetchedNote?.content || "",
+      });
     } catch (error) {
       console.error("Error fetching note:", error);
       setNote(null);
@@ -45,7 +61,31 @@ const Editor = ({ activeNoteId }: EditorProps) => {
       setNote(null);
     }
   }, [activeNoteId]);
+  useEffect(() => {
+    if (!note || !activeNoteId) return;
 
+    if (title === initialData.title && content === initialData.content) {
+      return;
+    }
+
+    const timeout = setTimeout(async () => {
+      try {
+        await axios.patch(
+          `https://nowted-server.remotestate.com/notes/${note.id}`,
+          {
+            title,
+            content,
+          },
+        );
+
+        setInitialData({ title, content });
+      } catch (error) {
+        console.error("Auto-save failed:", error);
+      }
+    }, 2000);
+
+    return () => clearTimeout(timeout);
+  }, [title, content]);
   const handleArchive = async () => {
     if (!note) return;
 
@@ -170,7 +210,12 @@ const Editor = ({ activeNoteId }: EditorProps) => {
   return (
     <div className="h-full flex flex-col px-12 py-10 overflow-y-auto text-primary">
       <div className="flex justify-between items-start mb-8">
-        <h1 className="text-2xl font-semibold tracking-tight">{note.title}</h1>
+        <input
+          value={title}
+          onChange={(e) => setTitle(e.target.value)}
+          className="text-2xl font-semibold tracking-tight bg-transparent outline-none w-full"
+          placeholder="Untitled"
+        />
         <div className="relative">
           <button
             onClick={() => setMenu((prev) => !prev)}
@@ -234,7 +279,11 @@ const Editor = ({ activeNoteId }: EditorProps) => {
       </div>
 
       <div className="space-y-5 text-sm leading-relaxed text-primary">
-        {note.content}
+        <textarea
+          value={content}
+          onChange={(e) => setContent(e.target.value)}
+          className="w-full min-h-600 bg-transparent outline-none  overflow-y-scroll scrollbar-hide "
+        />
       </div>
     </div>
   );
