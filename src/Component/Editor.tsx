@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import axios from "axios";
 import {
   Calendar,
@@ -19,13 +19,14 @@ const Editor = ({ activeNoteId }: EditorProps) => {
   const [note, setNote] = useState<any>(null);
   const [loading, setLoading] = useState(false);
   const [menu, setMenu] = useState(false);
-  const [initialContent, setInitialContent] = useState("");
+
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
   const [initialData, setInitialData] = useState({
     title: "",
     content: "",
   });
+  const menuRef = useRef<HTMLDivElement>(null);
   console.log(activeNoteId);
   const fetchNote = async (noteId: string) => {
     try {
@@ -86,6 +87,19 @@ const Editor = ({ activeNoteId }: EditorProps) => {
 
     return () => clearTimeout(timeout);
   }, [title, content]);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
+        setMenu(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
   const handleArchive = async () => {
     if (!note) return;
 
@@ -216,7 +230,7 @@ const Editor = ({ activeNoteId }: EditorProps) => {
           className="text-2xl font-semibold tracking-tight bg-transparent outline-none w-full"
           placeholder="Untitled"
         />
-        <div className="relative">
+        <div ref={menuRef} className="relative">
           <button
             onClick={() => setMenu((prev) => !prev)}
             className="p-2 rounded-md hover:bg-hover transition"

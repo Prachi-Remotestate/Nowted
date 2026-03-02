@@ -1,19 +1,38 @@
 import { useState, useEffect } from "react";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import Editor from "./Editor";
 import FilesList from "./FilesList";
 import SideBar from "./SideBar";
+import { NotesViewType, useNotes } from "../hooks/ContextNotes";
 
 const Main = () => {
   const { folderId, noteId } = useParams();
-  const [activeFolderId, setActiveFolderId] = useState<string | null>(null);
+  const navigate = useNavigate();
+
+  const {
+    folders,
+
+    setActiveFolderId,
+    viewType,
+  } = useNotes();
+
   const [isSearching, setIsSearching] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
+
   useEffect(() => {
     if (folderId) {
       setActiveFolderId(folderId);
     }
   }, [folderId]);
+
+  useEffect(() => {
+    if (viewType === NotesViewType.Folder && folders.length > 0 && !folderId) {
+      const firstFolder = folders[0];
+
+      setActiveFolderId(firstFolder.id);
+      navigate(`/folders/${firstFolder.id}`);
+    }
+  }, [folders, folderId, viewType]);
 
   return (
     <div className="h-screen overflow-hidden flex bg-primary text-primary">

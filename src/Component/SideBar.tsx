@@ -15,6 +15,7 @@ import {
   MoreVertical,
   Pencil,
   Trash2,
+  SunMoon,
 } from "lucide-react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useNotes, NotesViewType } from "../hooks/ContextNotes";
@@ -46,14 +47,8 @@ const SideBar = ({
 
   const { folderId, noteId } = useParams();
   const navigate = useNavigate();
-  const {
-    setViewType,
-    setActiveFolderId,
-    folders,
-    setFolders,
-    activeFolderId,
-  } = useNotes();
-
+  const { setViewType, setActiveFolderId, folders, setFolders } = useNotes();
+  const menuRef = useRef<HTMLDivElement>(null);
   const fetchRecents = async () => {
     try {
       const res = await axios.get(
@@ -157,6 +152,18 @@ const SideBar = ({
       }, 500);
     }
   };
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
+        setActiveMenuId(null);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
   const [editingFolderId, setEditingFolderId] = useState<string | null>(null);
   const [editingName, setEditingName] = useState("");
   const [activeMenuId, setActiveMenuId] = useState<string | null>(null);
@@ -176,10 +183,15 @@ const SideBar = ({
           <Pen
             size={16}
             strokeWidth={1.8}
-            className="text-primary  transition-colors cursor-pointer"
+            className="text-primary  transition-colors cursor-pointer mb-4"
           />
         </div>
-
+        <button
+          onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+          className="text-xs opacity-60 hover:opacity-100 transition  pl-9"
+        >
+          <SunMoon size={20} />
+        </button>
         <Search
           size={18}
           strokeWidth={1.8}
@@ -204,7 +216,7 @@ const SideBar = ({
         />
       ) : (
         <button
-          className={`w-full py-2.5 rounded-md text-sm font-medium transition mb-8 ${
+          className={`w-65 py-2.5 rounded-md text-sm font-medium transition mb-8 ml-5 ${
             !folderId ? "opacity-50 cursor-not-allowed" : "hover:opacity-90"
           }`}
           style={{ backgroundColor: "var(--bg-secondary)" }}
@@ -287,9 +299,7 @@ const SideBar = ({
                 onClick={() => {
                   if (editingFolderId) return;
                   setViewType(NotesViewType.Folder);
-                  navigate(
-                    `/folders/${folder.id}/${encodeURIComponent(folder.name)}`,
-                  );
+                  navigate(`/folders/${folder.id}/${folder.name}`);
                 }}
               >
                 <div className="flex items-center gap-3 flex-1 min-w-0">
@@ -345,7 +355,8 @@ const SideBar = ({
 
                 {activeMenuId === folder.id && (
                   <div
-                    className="right-2 top-9 bg-primary border border-theme rounded-md shadow-md z-20"
+                    ref={menuRef}
+                    className="absolute right-2 top-9 bg-primary border border-theme rounded-md shadow-md z-20"
                     onClick={(e) => e.stopPropagation()}
                   >
                     <button
@@ -426,13 +437,6 @@ const SideBar = ({
           </button>
         </div>
       </div>
-
-      <button
-        onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-        className="text-xs opacity-60 hover:opacity-100 transition mt-auto pt-6"
-      >
-        {theme === "dark" ? "Light" : "Dark"}
-      </button>
     </aside>
   );
 };

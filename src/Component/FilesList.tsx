@@ -77,13 +77,6 @@ const FilesList = ({ searchTerm }: Props) => {
       setLoading(false);
     }
   };
-  useEffect(() => {
-    setNotes([]);
-    setPage(1);
-    setHasMore(true);
-
-    fetchNotes(1, true);
-  }, [viewType, folderId]);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -132,8 +125,12 @@ const FilesList = ({ searchTerm }: Props) => {
     return () => clearTimeout(timer);
   }, [searchTerm]);
   useEffect(() => {
+    setNotes([]);
+    setPage(1);
+    setHasMore(true);
+
     fetchNotes(1, true);
-  }, [debouncedSearch, viewType, folderId]);
+  }, [viewType, folderId, debouncedSearch]);
   return (
     <div className="h-full flex flex-col text-primary">
       <div className="px-6 py-5 border-theme">
