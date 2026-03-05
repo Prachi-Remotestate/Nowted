@@ -169,7 +169,7 @@ const SideBar = ({
   const [activeMenuId, setActiveMenuId] = useState<string | null>(null);
   return (
     <aside
-      className="  flex flex-col bg-primary text-primary"
+      className="  flex flex-col bg-primary text-primary overflow-x-hidden"
       style={{
         padding: "var(--sidebar-padding-y) var(--sidebar-padding-x)",
       }}
@@ -216,7 +216,7 @@ const SideBar = ({
         />
       ) : (
         <button
-          className={`w-65 py-2.5 rounded-md text-sm font-medium transition mb-8 ml-5 ${
+          className={`w-55 py-2.5 rounded-md text-sm font-medium transition mb-8 ml-8 ${
             !folderId ? "opacity-50 cursor-not-allowed" : "hover:opacity-90"
           }`}
           style={{ backgroundColor: "var(--bg-secondary)" }}
@@ -231,7 +231,7 @@ const SideBar = ({
           Recents
         </h2>
 
-        <div className="flex flex-col gap-1 pl-3 text-secondary hover:text-primary">
+        <div className="flex flex-col gap-1 pl-3 text-secondary hover:text-primary hover:bg-hover">
           {recents.length === 0 && (
             <span className="text-xs text-secondary opacity-60">
               No recent notes
@@ -248,17 +248,18 @@ const SideBar = ({
                   navigate(`/folders/${note.folderId}/notes/${note.id}`)
                 }
                 className={`flex items-center gap-3 px-1 py-2 rounded-md text-sm text-left transition-colors
-        ${isActive ? "bg-amber-800 text-primary" : "text-secondary hover:bg-hover"}
+        ${isActive ? "bg-active text-primary" : "text-secondary hover:bg-hover"}
       `}
               >
-                <FileText
-                  size={16}
-                  strokeWidth={1.8}
-                  className={`transition-colors ${
-                    isActive ? "text-primary" : "text-secondary"
-                  }`}
-                />
-
+                <div>
+                  <FileText
+                    size={16}
+                    strokeWidth={1.8}
+                    className={`transition-colors ${
+                      isActive ? "text-primary" : "text-secondary"
+                    }`}
+                  />
+                </div>
                 <span className="truncate">{note.title || "Untitled"}</span>
               </button>
             );
@@ -275,7 +276,7 @@ const SideBar = ({
           <FolderPlus
             size={18}
             strokeWidth={1.8}
-            className="text-secondary hover:text-primary transition-colors cursor-pointer mr-4"
+            className="text-secondary hover:text-primary transition-colors cursor-pointer mr-2"
             onClick={() => setIsCreatingFolder(true)}
           />
         </div>
@@ -294,7 +295,7 @@ const SideBar = ({
               <div
                 key={folder.id}
                 className={`relative group flex items-center justify-between  py-2 rounded-md text-sm transition-colors cursor-pointer
-      ${isActive ? "bg-accent text-primary" : "text-secondary hover:bg-hover"}
+      ${isActive ? "bg-active text-primary" : "text-secondary hover:bg-hover"}
     `}
                 onClick={() => {
                   if (editingFolderId) return;
@@ -303,12 +304,13 @@ const SideBar = ({
                 }}
               >
                 <div className="flex items-center gap-3 flex-1 min-w-0">
-                  {isActive ? (
-                    <FolderOpen size={18} strokeWidth={1.8} />
-                  ) : (
-                    <Folder size={18} strokeWidth={1.8} />
-                  )}
-
+                  <div>
+                    {isActive ? (
+                      <FolderOpen size={18} strokeWidth={1.8} />
+                    ) : (
+                      <Folder size={18} strokeWidth={1.8} />
+                    )}
+                  </div>
                   {editingFolderId === folder.id ? (
                     <input
                       autoFocus

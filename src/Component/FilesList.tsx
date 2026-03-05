@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { useNotes, NotesViewType } from "../hooks/ContextNotes";
 import { useParams } from "react-router-dom";
 import { useRef } from "react";
+
 export interface Note {
   id: string;
   title: string;
@@ -39,7 +40,7 @@ const FilesList = ({ searchTerm }: Props) => {
         params.deleted = false;
       }
 
-      if (viewType === NotesViewType.Folder) {
+      if (viewType === NotesViewType.Folder && !debouncedSearch) {
         if (!folderId) return;
         params.folderId = folderId;
       }
@@ -102,9 +103,12 @@ const FilesList = ({ searchTerm }: Props) => {
 
     fetchNotes(page);
   }, [page]);
+  const [debouncedSearch, setDebouncedSearch] = useState("");
 
   useEffect(() => {
-    if (viewType === NotesViewType.Folder && folderId) {
+    if (debouncedSearch.trim()) {
+      setFolderName("Search Results");
+    } else if (viewType === NotesViewType.Folder && folderId) {
       const folder = folders.find((f) => f.id === folderId);
       setFolderName(folder?.name || "");
     } else if (viewType === NotesViewType.Favorites) {
@@ -115,7 +119,6 @@ const FilesList = ({ searchTerm }: Props) => {
       setFolderName("Trash");
     }
   }, [folderId, folders, viewType]);
-  const [debouncedSearch, setDebouncedSearch] = useState("");
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -132,10 +135,12 @@ const FilesList = ({ searchTerm }: Props) => {
     fetchNotes(1, true);
   }, [viewType, folderId, debouncedSearch]);
   return (
-    <div className="h-full flex flex-col text-primary">
+    <div className="h-full flex flex-col text-primary ">
       <div className="px-6 py-5 border-theme">
-        <h2 className="text-lg font-semibold tracking-tight">
-          {folderName || "Select a Folder"}
+        <h2 className="text-lg font-semibold tracking-tight  overflow-scroll scrollbar-hide">
+          {debouncedSearch.trim()
+            ? "Search Results"
+            : folderName || "Select a Folder"}
         </h2>
       </div>
 

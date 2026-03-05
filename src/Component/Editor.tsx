@@ -81,7 +81,7 @@ const Editor = ({ activeNoteId }: EditorProps) => {
 
         setInitialData({ title, content });
       } catch (error) {
-        console.error("Auto-save failed:", error);
+        console.error(error);
       }
     }, 2000);
 
@@ -167,7 +167,7 @@ const Editor = ({ activeNoteId }: EditorProps) => {
 
   if (!activeNoteId) {
     return (
-      <div className="h-full flex flex-col items-center justify-center text-center px-10 text-secondary">
+      <div className="h-full flex flex-col items-center justify-center text-center px-10 text-secondary ">
         <FileText size={48} strokeWidth={1.5} className="mb-6 opacity-60" />
         <h2 className="text-lg font-medium mb-2 text-primary">
           Select a note to view
@@ -286,9 +286,14 @@ const Editor = ({ activeNoteId }: EditorProps) => {
         </div>
         <div className="border-b border-theme " />
         <div className="flex items-center gap-3 pb-6">
-          <Folder size={16} className="text-secondary" />
+          <div>
+            <Folder size={16} className="text-secondary" />
+          </div>
+
           <span className="pr-6 text-secondary">folder</span>
-          <span className="text-primary underline">{note.folder?.name}</span>
+          <span className="text-primary underline truncate">
+            {note.folder?.name}
+          </span>
         </div>
       </div>
 
@@ -296,7 +301,7 @@ const Editor = ({ activeNoteId }: EditorProps) => {
         <textarea
           value={content}
           onChange={(e) => setContent(e.target.value)}
-          className="w-full min-h-600 bg-transparent outline-none  overflow-y-scroll scrollbar-hide "
+          className="w-full min-h-600 bg-transparent outline-none  overflow-y-scroll scrollbar-hide"
         />
       </div>
     </div>
