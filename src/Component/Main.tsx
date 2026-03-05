@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
 import Editor from "./Editor";
 import FilesList from "./FilesList";
 import SideBar from "./SideBar";
@@ -18,7 +18,7 @@ const Main = () => {
 
   const [isSearching, setIsSearching] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
-
+  const location = useLocation();
   useEffect(() => {
     if (folderId) {
       setActiveFolderId(folderId);
@@ -26,13 +26,18 @@ const Main = () => {
   }, [folderId]);
 
   useEffect(() => {
-    if (viewType === NotesViewType.Folder && folders.length > 0 && !folderId) {
+    if (
+      viewType === NotesViewType.Folder &&
+      folders.length > 0 &&
+      !folderId &&
+      location.pathname !== "/"
+    ) {
       const firstFolder = folders[0];
 
       setActiveFolderId(firstFolder.id);
       navigate(`/folders/${firstFolder.id}`);
     }
-  }, [folders, folderId, viewType]);
+  }, [folders, folderId, viewType, location.pathname]);
 
   return (
     <div className="h-screen overflow-hidden flex bg-primary text-primary">
