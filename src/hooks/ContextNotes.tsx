@@ -18,29 +18,29 @@ interface NotesContextType {
   viewType: NotesViewType;
   setViewType: React.Dispatch<React.SetStateAction<NotesViewType>>;
 
-  activeFolderId: string | null;
-  setActiveFolderId: React.Dispatch<React.SetStateAction<string | null>>;
-
   folders: FolderType[];
   setFolders: React.Dispatch<React.SetStateAction<FolderType[]>>;
+
+  searchTerm: string;
+  setSearchTerm: React.Dispatch<React.SetStateAction<string>>;
 }
 
 const NotesContext = createContext<NotesContextType | undefined>(undefined);
 
 export const NotesProvider = ({ children }: { children: React.ReactNode }) => {
   const [viewType, setViewType] = useState<NotesViewType>(NotesViewType.Folder);
-  const [activeFolderId, setActiveFolderId] = useState<string | null>(null);
   const [folders, setFolders] = useState<FolderType[]>([]);
+  const [searchTerm, setSearchTerm] = useState("");
 
   return (
     <NotesContext.Provider
       value={{
         viewType,
         setViewType,
-        activeFolderId,
-        setActiveFolderId,
         folders,
         setFolders,
+        searchTerm,
+        setSearchTerm,
       }}
     >
       {children}

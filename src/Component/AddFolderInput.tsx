@@ -1,5 +1,6 @@
 import { useState } from "react";
 import axios from "axios";
+import { toast } from "react-toastify";
 
 interface AddFolderInputProps {
   onCreated: () => void;
@@ -31,8 +32,10 @@ const AddFolderInput = ({ onCreated, onCancel }: AddFolderInputProps) => {
 
       onCreated();
       setName("");
+      toast.success("Folder created");
     } catch (error) {
       console.error("Failed to create folder:", error);
+      toast.error("Failed to create Folder");
     } finally {
       setLoading(false);
     }

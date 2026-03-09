@@ -99,3 +99,15 @@ body {
 .border-theme {
   border-color: var(--border-color);
 }
+
+
+@utility no-scrollbar {
+  /* Firefox */
+  scrollbar-width: none;
+  /* IE and Edge */
+  -ms-overflow-style: none;
+  /* Chrome, Safari, Opera, and new Edge */
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}

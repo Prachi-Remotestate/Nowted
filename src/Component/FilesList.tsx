@@ -1,9 +1,12 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import axios from "axios";
-import { useNavigate } from "react-router-dom";
-import { useNotes, NotesViewType } from "../hooks/ContextNotes";
-import { useParams } from "react-router-dom";
-import { useRef } from "react";
+import {
+  useNavigate,
+  useParams,
+  useLocation,
+  useOutletContext,
+} from "react-router-dom";
+import { useNotes } from "../hooks/ContextNotes";
 
 export interface Note {
   id: string;
@@ -11,20 +14,28 @@ export interface Note {
   createdAt: string;
   preview: string;
 }
-interface Props {
-  searchTerm: string;
-}
-const FilesList = ({ searchTerm }: Props) => {
+export let triggerNotesRefresh: () => void;
+
+const FilesList = () => {
   const [notes, setNotes] = useState<Note[]>([]);
   const [loading, setLoading] = useState(false);
   const [folderName, setFolderName] = useState("");
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
+  const { refreshNotes } = useOutletContext<{ refreshNotes: number }>();
   const navigate = useNavigate();
-  const { folders, viewType } = useNotes();
+  const location = useLocation();
+
+  const { folders, searchTerm } = useNotes();
   const { folderId, noteId } = useParams();
 
   const listRef = useRef<HTMLDivElement>(null);
+
+  const isFolder = location.pathname.startsWith("/folders");
+  const isFavorites = location.pathname.startsWith("/favorites");
+  const isArchived = location.pathname.startsWith("/archived");
+  const isTrash = location.pathname.startsWith("/trash");
+
   const fetchNotes = async (pageNumber: number, reset = false) => {
     try {
       setLoading(true);
@@ -32,24 +43,22 @@ const FilesList = ({ searchTerm }: Props) => {
       const params: any = {
         page: pageNumber,
         limit: 10,
+        deleted: false,
       };
 
-      if (viewType === NotesViewType.Trash) {
+      if (isTrash) {
         params.deleted = true;
-      } else {
-        params.deleted = false;
       }
 
-      if (viewType === NotesViewType.Folder && !debouncedSearch) {
-        if (!folderId) return;
+      if (isFolder && !debouncedSearch && folderId) {
         params.folderId = folderId;
       }
 
-      if (viewType === NotesViewType.Favorites) {
+      if (isFavorites) {
         params.favorite = true;
       }
 
-      if (viewType === NotesViewType.Archived) {
+      if (isArchived) {
         params.archived = true;
       }
 
@@ -103,22 +112,23 @@ const FilesList = ({ searchTerm }: Props) => {
 
     fetchNotes(page);
   }, [page]);
-  const [debouncedSearch, setDebouncedSearch] = useState("");
 
+  const [debouncedSearch, setDebouncedSearch] = useState("");
+  const basePath = location.pathname.split("/notes")[0];
   useEffect(() => {
     if (debouncedSearch.trim()) {
       setFolderName("Search Results");
-    } else if (viewType === NotesViewType.Folder && folderId) {
+    } else if (isFolder && folderId) {
       const folder = folders.find((f) => f.id === folderId);
       setFolderName(folder?.name || "");
-    } else if (viewType === NotesViewType.Favorites) {
+    } else if (isFavorites) {
       setFolderName("Favorites");
-    } else if (viewType === NotesViewType.Archived) {
+    } else if (isArchived) {
       setFolderName("Archived");
-    } else if (viewType === NotesViewType.Trash) {
+    } else if (isTrash) {
       setFolderName("Trash");
     }
-  }, [folderId, folders, viewType]);
+  }, [folderId, folders, basePath]);
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -127,17 +137,19 @@ const FilesList = ({ searchTerm }: Props) => {
 
     return () => clearTimeout(timer);
   }, [searchTerm]);
+
   useEffect(() => {
     setNotes([]);
     setPage(1);
     setHasMore(true);
 
     fetchNotes(1, true);
-  }, [viewType, folderId, debouncedSearch]);
+  }, [basePath, debouncedSearch, refreshNotes]);
+
   return (
     <div className="h-full flex flex-col text-primary ">
       <div className="px-6 py-5 border-theme">
-        <h2 className="text-lg font-semibold tracking-tight  overflow-scroll scrollbar-hide">
+        <h2 className="text-lg font-semibold tracking-tight overflow-scroll scrollbar-hide">
           {debouncedSearch.trim()
             ? "Search Results"
             : folderName || "Select a Folder"}
@@ -161,20 +173,13 @@ const FilesList = ({ searchTerm }: Props) => {
         {notes.map((note) => (
           <div
             key={note.id}
-            onClick={() =>
-              navigate(
-                viewType === NotesViewType.Folder
-                  ? `/folders/${folderId}/notes/${note.id}`
-                  : `/notes/${note.id}`,
-              )
-            }
-            className={`border-theme rounded-lg p-4 cursor-pointer transition-all
-    ${
-      noteId === note.id
-        ? "bg-hover border border-primary"
-        : "bg-primary bg-opacity-60 hover:bg-hover"
-    }
-  `}
+            onClick={() => navigate(`notes/${note.id}`)}
+            className={`border-theme rounded-md  p-4 cursor-pointer transition-all
+            ${
+              noteId === note.id
+                ? "border  bg-active "
+                : "bg-secondary  border-secondary "
+            }`}
           >
             <div className="flex items-center gap-2 mb-2">
               <h3 className="text-sm font-medium truncate">{note.title}</h3>
