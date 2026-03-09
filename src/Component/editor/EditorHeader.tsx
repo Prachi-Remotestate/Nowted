@@ -2,7 +2,7 @@ import { useState, useRef, useEffect } from "react";
 import { Calendar, Folder } from "lucide-react";
 import EditorMenu from "./EditorMenu";
 import { updateNote } from "../../api/Notesapi";
-import { useNotes } from "../../hooks/ContextNotes";
+import { useNotes } from "../../context/ContextNotes";
 import { useNavigate, useParams } from "react-router-dom";
 import { toast } from "react-toastify";
 
@@ -21,6 +21,7 @@ const EditorHeader = ({ note, setNote, triggerRefresh }: any) => {
 
     setNote({ ...note, title: value });
     toast.success("Title Updated");
+    triggerRefresh();
   };
 
   useEffect(() => {

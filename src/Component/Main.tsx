@@ -11,10 +11,10 @@ const Main = () => {
   };
 
   return (
-    <div className="h-screen overflow-hidden flex bg-primary text-primary">
+    <div className="h-screen overflow-hidden flex  text-primary">
       {/* Sidebar */}
       <div
-        className="relative z-10 overflow-y-scroll scrollbar-hide shrink-0 border-r"
+        className="relative z-10 overflow-y-scroll bg-primary scrollbar-hide shrink-0 border-r"
         style={{
           width: "var(--sidebar-width)",
           borderColor: "var(--border-color)",
@@ -25,7 +25,7 @@ const Main = () => {
 
       {/* Files List */}
       <div
-        className="relative z-0 shrink-0 border-r overflow-y-auto bg-primary opacity-100"
+        className="relative z-0 shrink-0 border-r overflow-y-auto bg-primary/40"
         style={{
           width: "var(--middle-width)",
           backgroundColor: "var(--bg-primary)",
@@ -36,7 +36,7 @@ const Main = () => {
       </div>
 
       {/* Editor */}
-      <div className="relative z-0 flex-1 overflow-y-auto">
+      <div className="relative z-0 flex-1 overflow-y-auto bg-primary">
         <Editor triggerRefresh={triggerRefresh} />
       </div>
     </div>

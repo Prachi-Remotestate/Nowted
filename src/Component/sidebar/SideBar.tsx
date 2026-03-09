@@ -12,24 +12,29 @@ const SideBar = () => {
 
   return (
     <aside
-      className="flex flex-col bg-primary text-primary overflow-x-hidden"
+      className="flex flex-col bg-primary text-primary overflow-x-hidden no-scrollbar  h-screen"
       style={{
         padding: "var(--sidebar-padding-y) var(--sidebar-padding-x)",
       }}
     >
-      <SidebarHeader setIsSearching={setIsSearching} />
+      <div className="flex flex-col justify-between no-scrollbar h-full">
+        <div>
+          <SidebarHeader setIsSearching={setIsSearching} />
 
-      {isSearching ? (
-        <SearchInput onClose={() => setIsSearching(false)} />
-      ) : (
-        <NewNoteButton />
-      )}
+          {isSearching ? (
+            <SearchInput onClose={() => setIsSearching(false)} />
+          ) : (
+            <NewNoteButton />
+          )}
 
-      <RecentsSection />
+          <RecentsSection />
 
-      <FoldersSection />
-
-      <MoreSection />
+          <FoldersSection />
+        </div>
+        <div>
+          <MoreSection />
+        </div>
+      </div>
     </aside>
   );
 };

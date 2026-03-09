@@ -1,4 +1,4 @@
-import { useNotes } from "../../hooks/ContextNotes";
+import { useNotes } from "../../context/ContextNotes";
 
 interface Props {
   onClose: () => void;

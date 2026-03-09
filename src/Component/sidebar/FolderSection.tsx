@@ -3,7 +3,7 @@ import { getFolders } from "../../api/Foldersapi";
 import { FolderPlus } from "lucide-react";
 import FolderItem from "./FolderItem";
 import AddFolderInput from "../AddFolderInput";
-import { useNotes } from "../../hooks/ContextNotes";
+import { useNotes } from "../../context/ContextNotes";
 
 const FoldersSection = () => {
   const { folders, setFolders } = useNotes();
@@ -11,7 +11,7 @@ const FoldersSection = () => {
 
   const fetchFolders = async () => {
     const data = await getFolders();
-    setFolders(data); // update global context
+    setFolders(data);
   };
 
   useEffect(() => {
@@ -19,7 +19,7 @@ const FoldersSection = () => {
   }, []);
 
   return (
-    <section className="flex flex-col mb-6">
+    <section className="flex flex-col  mb-4">
       <div className="flex justify-between items-center mb-4">
         <h2 className="text-xs uppercase text-secondary pl-2">Folders</h2>
 

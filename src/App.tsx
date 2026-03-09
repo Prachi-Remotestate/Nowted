@@ -2,7 +2,7 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import Main from "./Component/Main";
 import FilesList from "./Component/FilesList";
 import Editor from "./Component/editor/Editor";
-import { NotesProvider } from "./hooks/ContextNotes";
+import { NotesProvider } from "./context/ContextNotes";
 
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";

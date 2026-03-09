@@ -7,8 +7,9 @@ export const getRecentNotes = async () => {
   return res.data?.recentNotes || [];
 };
 
-export const getNotes = async (params?: any) => {
-  const res = await axios.get(`${BASE_URL}`, { params });
+export const getNotes = async (params?: Record<string, any>) => {
+  const res = await axios.get(`${BASE_URL}/notes`, { params });
+  return res.data;
 };
 export const createNote = async (folderId: string) => {
   const res = await axios.post(`${BASE_URL}`, {

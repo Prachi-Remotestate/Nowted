@@ -6,7 +6,7 @@ import {
   useLocation,
   useOutletContext,
 } from "react-router-dom";
-import { useNotes } from "../hooks/ContextNotes";
+import { useNotes } from "../context/ContextNotes";
 
 export interface Note {
   id: string;

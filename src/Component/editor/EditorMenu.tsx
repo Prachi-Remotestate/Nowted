@@ -3,10 +3,13 @@ import { CircleEllipsis, Star, Archive, Trash } from "lucide-react";
 import { updateNote, deleteNote } from "../../api/Notesapi";
 import { toast } from "react-toastify";
 import ConfirmDialog from "../ConfirmDialog";
+import { useNavigate, useParams } from "react-router-dom";
 const EditorMenu = ({ note, setNote, triggerRefresh }: any) => {
   const [menu, setMenu] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
   const [confirmOpen, setConfirmOpen] = useState(false);
+  const { folderId: currentFolderId } = useParams();
+  const navigate = useNavigate();
   const toggleFavorite = async () => {
     const newValue = !note.isFavorite;
 
@@ -28,7 +31,11 @@ const EditorMenu = ({ note, setNote, triggerRefresh }: any) => {
     setNote({ ...note, isArchived: newValue });
 
     toast.success(newValue ? "Note Archived" : "Note Unarchived");
-
+    if (newValue) {
+      navigate(`/folders/${currentFolderId}`);
+    } else {
+      navigate(`/archived`);
+    }
     setMenu(false);
     triggerRefresh();
   };
