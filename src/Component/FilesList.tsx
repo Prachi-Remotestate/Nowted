@@ -7,6 +7,7 @@ import {
   useOutletContext,
 } from "react-router-dom";
 import { useNotes } from "../context/ContextNotes";
+import type { AllNotes } from "../types/apitype";
 
 export interface Note {
   id: string;
@@ -21,6 +22,7 @@ const FilesList = () => {
   const [loading, setLoading] = useState(false);
   const [folderName, setFolderName] = useState("");
   const [page, setPage] = useState(1);
+  const [loadingMore, setLoadingMore] = useState(false);
   const [hasMore, setHasMore] = useState(true);
   const { refreshNotes } = useOutletContext<{ refreshNotes: number }>();
   const navigate = useNavigate();
@@ -38,7 +40,11 @@ const FilesList = () => {
 
   const fetchNotes = async (pageNumber: number, reset = false) => {
     try {
-      setLoading(true);
+      if (reset) {
+        setLoading(true);
+      } else {
+        setLoadingMore(true);
+      }
 
       const params: any = {
         page: pageNumber,
@@ -46,27 +52,21 @@ const FilesList = () => {
         deleted: false,
       };
 
-      if (isTrash) {
-        params.deleted = true;
-      }
+      if (isTrash) params.deleted = true;
 
       if (isFolder && !debouncedSearch && folderId) {
         params.folderId = folderId;
       }
 
-      if (isFavorites) {
-        params.favorite = true;
-      }
+      if (isFavorites) params.favorite = true;
 
-      if (isArchived) {
-        params.archived = true;
-      }
+      if (isArchived) params.archived = true;
 
       if (debouncedSearch.trim()) {
         params.search = debouncedSearch.trim();
       }
 
-      const res = await axios.get(
+      const res = await axios.get<AllNotes>(
         "https://nowted-server.remotestate.com/notes",
         { params },
       );
@@ -85,6 +85,7 @@ const FilesList = () => {
       if (reset) setNotes([]);
     } finally {
       setLoading(false);
+      setLoadingMore(false);
     }
   };
 
@@ -94,7 +95,7 @@ const FilesList = () => {
 
       const { scrollTop, scrollHeight, clientHeight } = listRef.current;
 
-      if (scrollTop + clientHeight >= scrollHeight - 40) {
+      if (scrollTop + clientHeight >= scrollHeight - 100) {
         setPage((prevPage) => prevPage + 1);
       }
     };
@@ -177,7 +178,7 @@ const FilesList = () => {
             className={`border-theme rounded-md  p-4 cursor-pointer transition-all
             ${
               noteId === note.id
-                ? "border  bg-active "
+                ? "border  bg-active text-primary"
                 : "bg-secondary  border-secondary "
             }`}
           >
@@ -196,6 +197,11 @@ const FilesList = () => {
             </div>
           </div>
         ))}
+        {loadingMore && (
+          <div className="flex justify-center py-4 text-xs text-secondary">
+            Loading more...
+          </div>
+        )}
       </div>
     </div>
   );

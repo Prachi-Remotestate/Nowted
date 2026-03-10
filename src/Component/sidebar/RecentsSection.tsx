@@ -2,9 +2,10 @@ import { useEffect, useState } from "react";
 import { getRecentNotes } from "../../api/Notesapi";
 import { FileText } from "lucide-react";
 import { useNavigate, useParams } from "react-router-dom";
-
+import type { RecentNote } from "../../types/types";
+import type { previewRes } from "../../types/apitype";
 const RecentsSection = () => {
-  const [recents, setRecents] = useState([]);
+  const [recents, setRecents] = useState<previewRes[]>([]);
   const navigate = useNavigate();
   const { noteId } = useParams();
 
@@ -22,7 +23,7 @@ const RecentsSection = () => {
       <h2 className="text-xs uppercase mb-4 text-secondary pl-2">Recents</h2>
 
       <div className="flex flex-col gap-1 ">
-        {recents.map((note: any) => {
+        {recents.map((note: RecentNote) => {
           const isActive = noteId === note.id;
 
           return (
@@ -35,7 +36,10 @@ const RecentsSection = () => {
               ${isActive ? "bg-active text-primary" : "text-secondary hover:bg-hover"}
               `}
             >
-              <FileText size={16} />
+              <div>
+                <FileText size={16} />
+              </div>
+
               <span className="truncate">{note.title || "Untitled"}</span>
             </button>
           );

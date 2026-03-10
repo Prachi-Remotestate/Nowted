@@ -60,7 +60,7 @@ const FolderItem = ({ folder, refreshFolders }: any) => {
 
   return (
     <div
-      className={`relative flex items-center justify-between py-2 px-2  text-sm cursor-pointer
+      className={`group relative flex items-center justify-between py-2 px-2  text-sm cursor-pointer
       ${isActive ? "bg-active text-primary" : "text-secondary hover:bg-hover"}
       `}
       onClick={() => {
@@ -89,6 +89,9 @@ const FolderItem = ({ folder, refreshFolders }: any) => {
       </div>
 
       <div
+        className={`transition-opacity ${
+          isActive ? "opacity-100" : "opacity-0 group-hover:opacity-100"
+        }`}
         onClick={(e) => {
           e.stopPropagation();
           setActiveMenu(!activeMenu);

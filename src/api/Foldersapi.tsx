@@ -1,9 +1,10 @@
 import axios from "axios";
+import type { getfolders } from "../types/apitype";
 
 const BASE_URL = "https://nowted-server.remotestate.com";
 
 export const getFolders = async () => {
-  const res = await axios.get(`${BASE_URL}/folders`);
+  const res = await axios.get<getfolders>(`${BASE_URL}/folders`);
   return res.data?.folders || [];
 };
 

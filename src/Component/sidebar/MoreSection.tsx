@@ -2,7 +2,7 @@ import { Star, Archive, Trash } from "lucide-react";
 import { NavLink } from "react-router-dom";
 
 const MoreSection = () => {
-  const base = "flex items-center gap-3 py-2 px-2 rounded-md transition";
+  const base = "flex items-center gap-3 py-2 px-2 transition";
 
   const active = "bg-active text-primary";
   const inactive = "text-secondary";

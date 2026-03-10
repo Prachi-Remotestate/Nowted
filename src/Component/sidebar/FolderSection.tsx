@@ -25,12 +25,12 @@ const FoldersSection = () => {
 
         <FolderPlus
           size={18}
-          className="cursor-pointer mr-2"
+          className="cursor-pointer mr-2 text-secondary"
           onClick={() => setIsCreatingFolder(true)}
         />
       </div>
 
-      <div className="flex flex-col gap-1 overflow-y-scroll overflow-x-hidden scrollbar-hide h-55">
+      <div className="flex flex-col gap-1 overflow-y-scroll overflow-x-hidden scrollbar-hide max-h-[30vh]">
         {folders.map((folder: any) => (
           <FolderItem
             key={folder.id}

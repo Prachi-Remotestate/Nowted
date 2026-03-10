@@ -6,8 +6,15 @@ import EditorHeader from "./EditorHeader";
 import EditorContent from "./EditorContent";
 import EmptyEditor from "./EmptyEditor";
 import DeletedNoteView from "./DeletedNoteView";
+import type { Note } from "../../types/types";
 
-const Editor = ({ triggerRefresh }: any) => {
+export interface NoteEditorProps {
+  note: Note;
+  setNote: React.Dispatch<React.SetStateAction<Note | null>>;
+  triggerRefresh: () => void;
+}
+
+const Editor = ({ triggerRefresh }: NoteEditorProps) => {
   const { noteId } = useParams();
 
   const [note, setNote] = useState<any>(null);

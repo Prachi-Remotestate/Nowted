@@ -1,14 +1,15 @@
 import axios from "axios";
+import type { getNotesRes, recentNote } from "../types/apitype";
 
 const BASE_URL = "https://nowted-server.remotestate.com/notes";
 
 export const getRecentNotes = async () => {
-  const res = await axios.get(`${BASE_URL}/recent`);
+  const res = await axios.get<recentNote>(`${BASE_URL}/recent`);
   return res.data?.recentNotes || [];
 };
 
 export const getNotes = async (params?: Record<string, any>) => {
-  const res = await axios.get(`${BASE_URL}/notes`, { params });
+  const res = await axios.get<getNotesRes>(`${BASE_URL}/notes`, { params });
   return res.data;
 };
 export const createNote = async (folderId: string) => {

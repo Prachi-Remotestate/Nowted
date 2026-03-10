@@ -5,8 +5,8 @@ import { updateNote } from "../../api/Notesapi";
 import { useNotes } from "../../context/ContextNotes";
 import { useNavigate, useParams } from "react-router-dom";
 import { toast } from "react-toastify";
-
-const EditorHeader = ({ note, setNote, triggerRefresh }: any) => {
+import type { NoteEditorProps } from "./Editor";
+const EditorHeader = ({ note, setNote, triggerRefresh }: NoteEditorProps) => {
   const [title, setTitle] = useState(note.title);
   const { folders } = useNotes();
 
@@ -91,34 +91,39 @@ const EditorHeader = ({ note, setNote, triggerRefresh }: any) => {
         </div>
 
         <div className="border-b border-theme" />
-        <div className="flex items-center gap-2 pb-6">
-          <Folder size={16} className="text-secondary" />
 
-          <span className=" text-secondary">Folder</span>
+        <div className="flex flex-rowitems-start gap-2 pb-6">
+          <Folder size={16} className="text-secondary mt-1" />
 
-          <div ref={dropdownRef} className="relative">
-            <button
-              onClick={() => setFolderMenu((prev) => !prev)}
-              className="underline truncate cursor-pointer"
-            >
-              {note.folder?.name || "No Folder"}
-            </button>
+          <div className="flex flex-row gap-2">
+            <span className="text-secondary">Folder</span>
 
-            {folderMenu && (
-              <div className="absolute left-0 mt-2 w-48 rounded-md shadow-lg border border-theme bg-primary z-50">
-                {folders.map((folder: any) => (
-                  <button
-                    key={folder.id}
-                    onClick={() => moveNote(folder.id)}
-                    className={`block w-full text-left px-4 py-2 text-sm hover:bg-hover ${
-                      folder.id === note.folder?.id ? "bg-hover" : ""
-                    }`}
-                  >
-                    {folder.name}
-                  </button>
-                ))}
-              </div>
-            )}
+            <div ref={dropdownRef} className="relative">
+              <button
+                onClick={() => setFolderMenu((prev) => !prev)}
+                className="underline truncate cursor-pointer"
+              >
+                {note.folder?.name || "No Folder"}
+              </button>
+
+              {folderMenu && (
+                <div className="absolute left-0 mt-2 w-48 rounded-md shadow-lg border border-theme bg-primary z-50">
+                  <div className="max-h-55 overflow-y-auto scrollbar-hide">
+                    {folders.map((folder) => (
+                      <button
+                        key={folder.id}
+                        onClick={() => moveNote(folder.id)}
+                        className={`block w-full text-left px-4 py-2 text-sm hover:bg-hover ${
+                          folder.id === note.folder?.id ? "bg-hover" : ""
+                        }`}
+                      >
+                        {folder.name}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
           </div>
         </div>
       </div>

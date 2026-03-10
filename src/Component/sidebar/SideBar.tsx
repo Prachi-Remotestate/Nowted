@@ -12,7 +12,7 @@ const SideBar = () => {
 
   return (
     <aside
-      className="flex flex-col bg-primary text-primary overflow-x-hidden no-scrollbar  h-screen"
+      className="flex flex-col bg-primary text-primary overflow-x-hidden no-scrollbar  h-full"
       style={{
         padding: "var(--sidebar-padding-y) var(--sidebar-padding-x)",
       }}
