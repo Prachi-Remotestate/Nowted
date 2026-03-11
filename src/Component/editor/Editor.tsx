@@ -14,7 +14,7 @@ export interface NoteEditorProps {
   triggerRefresh: () => void;
 }
 
-const Editor = ({ triggerRefresh }: NoteEditorProps) => {
+const Editor = ({ triggerRefresh }: any) => {
   const { noteId } = useParams();
 
   const [note, setNote] = useState<any>(null);

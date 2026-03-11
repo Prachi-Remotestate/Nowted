@@ -1,13 +1,15 @@
 import { useEffect, useState, useRef } from "react";
-import axios from "axios";
+
 import {
   useNavigate,
   useParams,
   useLocation,
   useOutletContext,
+  useSearchParams,
 } from "react-router-dom";
 import { useNotes } from "../context/ContextNotes";
-import type { AllNotes } from "../types/apitype";
+
+import { getNotes } from "../api/Notesapi";
 
 export interface Note {
   id: string;
@@ -27,19 +29,22 @@ const FilesList = () => {
   const { refreshNotes } = useOutletContext<{ refreshNotes: number }>();
   const navigate = useNavigate();
   const location = useLocation();
-
-  const { folders, searchTerm } = useNotes();
+  const requestIdRef = useRef(0);
+  const { folders } = useNotes();
   const { folderId, noteId } = useParams();
 
+  const [searchParams] = useSearchParams();
+  const searchTerm = searchParams.get("search") || "";
   const listRef = useRef<HTMLDivElement>(null);
-
   const isFolder = location.pathname.startsWith("/folders");
   const isFavorites = location.pathname.startsWith("/favorites");
   const isArchived = location.pathname.startsWith("/archived");
   const isTrash = location.pathname.startsWith("/trash");
 
   const fetchNotes = async (pageNumber: number, reset = false) => {
+    const requestId = ++requestIdRef.current;
     try {
+      console.log({ loading });
       if (reset) {
         setLoading(true);
       } else {
@@ -62,16 +67,14 @@ const FilesList = () => {
 
       if (isArchived) params.archived = true;
 
-      if (debouncedSearch.trim()) {
-        params.search = debouncedSearch.trim();
+      if (searchTerm.trim()) {
+        params.search = searchTerm.trim();
       }
 
-      const res = await axios.get<AllNotes>(
-        "https://nowted-server.remotestate.com/notes",
-        { params },
-      );
+      const data = await getNotes(params);
 
-      const newNotes = res.data?.notes || [];
+      if (requestId !== requestIdRef.current) return;
+      const newNotes = data?.notes || [];
 
       if (reset) {
         setNotes(newNotes);
@@ -80,12 +83,19 @@ const FilesList = () => {
       }
 
       setHasMore(newNotes.length === 10);
-    } catch (error) {
+    } catch (error: any) {
+      if (error.name === "CanceledError" || error.name === "AbortError") {
+        return;
+      }
+
       console.error("Error fetching notes:", error);
+
       if (reset) setNotes([]);
     } finally {
-      setLoading(false);
-      setLoadingMore(false);
+      if (requestId === requestIdRef.current) {
+        setLoading(false);
+        setLoadingMore(false);
+      }
     }
   };
 
@@ -149,7 +159,7 @@ const FilesList = () => {
 
   return (
     <div className="h-full flex flex-col text-primary ">
-      <div className="px-6 py-5 border-theme">
+      <div className="px-6 pt-3 border-theme">
         <h2 className="text-lg font-semibold tracking-tight overflow-scroll scrollbar-hide">
           {debouncedSearch.trim()
             ? "Search Results"
@@ -165,7 +175,7 @@ const FilesList = () => {
           <div className="text-sm text-secondary">Loading notes...</div>
         )}
 
-        {!loading && notes.length === 0 && (
+        {!loading && !loadingMore && notes.length === 0 && (
           <div className="flex items-center justify-center h-full text-sm text-secondary">
             No notes found.
           </div>

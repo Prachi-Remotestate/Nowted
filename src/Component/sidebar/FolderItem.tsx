@@ -68,9 +68,8 @@ const FolderItem = ({ folder, refreshFolders }: any) => {
         navigate(`/folders/${folder.id}`);
       }}
     >
-      <div className="flex items-center gap-3 flex-1">
-        {isActive ? <FolderOpen size={18} /> : <Folder size={18} />}
-
+      <div className="flex items-center gap-3 ">
+        <div>{isActive ? <FolderOpen size={18} /> : <Folder size={18} />}</div>
         {editing ? (
           <input
             autoFocus

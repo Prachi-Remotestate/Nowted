@@ -4,7 +4,8 @@ import { updateNote, deleteNote } from "../../api/Notesapi";
 import { toast } from "react-toastify";
 import ConfirmDialog from "../ConfirmDialog";
 import { useNavigate, useParams } from "react-router-dom";
-const EditorMenu = ({ note, setNote, triggerRefresh }: any) => {
+import type { NoteEditorProps } from "./Editor";
+const EditorMenu = ({ note, setNote, triggerRefresh }: NoteEditorProps) => {
   const [menu, setMenu] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
   const [confirmOpen, setConfirmOpen] = useState(false);

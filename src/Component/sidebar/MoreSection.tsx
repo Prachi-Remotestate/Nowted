@@ -4,11 +4,11 @@ import { NavLink } from "react-router-dom";
 const MoreSection = () => {
   const base = "flex items-center gap-3 py-2 px-2 transition";
 
-  const active = "bg-active text-primary";
+  const active = "text-active";
   const inactive = "text-secondary";
 
   return (
-    <div className="pt-6 ">
+    <div className="py-4 fixed bottom-0 ">
       <h2 className="text-xs uppercase mb-3 text-secondary pl-2">More</h2>
 
       <div className="flex flex-col gap-1 pl-2">

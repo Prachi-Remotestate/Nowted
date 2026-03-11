@@ -1,24 +1,40 @@
-import { useNotes } from "../../context/ContextNotes";
+import { useSearchParams } from "react-router-dom";
 
 interface Props {
   onClose: () => void;
 }
 
 const SearchInput = ({ onClose }: Props) => {
-  const { searchTerm, setSearchTerm } = useNotes();
+  const [searchParams, setSearchParams] = useSearchParams();
+
+  const searchTerm = searchParams.get("search") || "";
+
+  const handleChange = (value: string) => {
+    const params = new URLSearchParams(searchParams);
+
+    if (value.trim()) {
+      params.set("search", value);
+    } else {
+      params.delete("search");
+    }
+
+    setSearchParams(params);
+  };
 
   return (
-    <input
-      autoFocus
-      value={searchTerm}
-      onChange={(e) => setSearchTerm(e.target.value)}
-      onBlur={() => {
-        if (!searchTerm) onClose();
-      }}
-      placeholder="Search notes..."
-      className="w-55 py-2.5 px-3 rounded-md text-sm outline-none mb-8 ml-8"
-      style={{ backgroundColor: "var(--bg-secondary)" }}
-    />
+    <div className="w-full flex justify-center">
+      <input
+        autoFocus
+        value={searchTerm}
+        onChange={(e) => handleChange(e.target.value)}
+        onBlur={() => {
+          if (!searchTerm) onClose();
+        }}
+        placeholder="Search notes..."
+        className="w-4/5 py-1.5 rounded-md text-sm outline-none pb-4"
+        style={{ backgroundColor: "var(--bg-secondary)" }}
+      />
+    </div>
   );
 };
 

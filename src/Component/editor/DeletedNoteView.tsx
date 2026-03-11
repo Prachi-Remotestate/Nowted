@@ -1,10 +1,14 @@
 import { ClockFading } from "lucide-react";
 import { restoreNote } from "../../api/Notesapi";
+import type { NoteEditorProps } from "./Editor";
 
-const DeletedNoteView = ({ note }: any) => {
+const DeletedNoteView = ({ note }: Partial<NoteEditorProps>) => {
   const handleRestore = async () => {
     try {
-      await restoreNote(note.id);
+      if (note) {
+        await restoreNote(note.id);
+      }
+
       window.location.reload();
     } catch (error) {
       console.error("Restore failed:", error);
@@ -18,7 +22,7 @@ const DeletedNoteView = ({ note }: any) => {
       </div>
 
       <h2 className="text-lg font-medium mb-2 text-primary">
-        Restore "{note.title}"
+        Restore "{note ? note.title : ""}"
       </h2>
 
       <p className="text-sm max-w-md text-secondary mb-6">

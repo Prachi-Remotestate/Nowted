@@ -30,15 +30,17 @@ const NewNoteButton = () => {
   };
 
   return (
-    <button
-      className={`w-55 py-2.5 rounded-md text-sm font-medium transition mb-8 ml-8 ${
-        !folderId ? "opacity-50 cursor-not-allowed" : "hover:opacity-90"
-      }`}
-      style={{ backgroundColor: "var(--bg-secondary)" }}
-      onClick={handleCreateNote}
-    >
-      + New Note
-    </button>
+    <div className="w-full flex justify-center">
+      <button
+        className={`w-4/5 py-2 rounded-md text-sm font-medium transition ${
+          !folderId ? "opacity-50 cursor-not-allowed" : "hover:opacity-90"
+        }`}
+        style={{ backgroundColor: "var(--bg-secondary)" }}
+        onClick={handleCreateNote}
+      >
+        + New Note
+      </button>
+    </div>
   );
 };
 

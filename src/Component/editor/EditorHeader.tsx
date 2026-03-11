@@ -3,15 +3,17 @@ import { Calendar, Folder } from "lucide-react";
 import EditorMenu from "./EditorMenu";
 import { updateNote } from "../../api/Notesapi";
 import { useNotes } from "../../context/ContextNotes";
-import { useNavigate, useParams } from "react-router-dom";
-import { toast } from "react-toastify";
+import { useNavigate } from "react-router-dom";
+
 import type { NoteEditorProps } from "./Editor";
+import { toast } from "react-toastify";
+
 const EditorHeader = ({ note, setNote, triggerRefresh }: NoteEditorProps) => {
   const [title, setTitle] = useState(note.title);
   const { folders } = useNotes();
 
   const [folderMenu, setFolderMenu] = useState(false);
-  const { folderId: currentFolderId } = useParams();
+
   const dropdownRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
   const handleTitleChange = async (value: string) => {
@@ -20,7 +22,7 @@ const EditorHeader = ({ note, setNote, triggerRefresh }: NoteEditorProps) => {
     await updateNote(note.id, { title: value });
 
     setNote({ ...note, title: value });
-    toast.success("Title Updated");
+
     triggerRefresh();
   };
 
@@ -50,14 +52,24 @@ const EditorHeader = ({ note, setNote, triggerRefresh }: NoteEditorProps) => {
 
       await updateNote(note.id, { folderId: newFolderId });
 
-      setFolderMenu(false);
+      const newFolder = folders.find((f) => f.id === newFolderId);
 
-      setNote(null);
+      setNote({
+        ...note,
+        folder: newFolder,
+      });
+
+      setFolderMenu(false);
 
       triggerRefresh();
 
-      toast.success(` Note moved successfully`);
-      navigate(`/folders/${currentFolderId}`);
+      toast.success("Note moved successfully");
+
+      if (note.isArchived) {
+        navigate(`/archived/notes/${note.id}`);
+      } else {
+        navigate(`/folders/${newFolderId}/notes/${note.id}`);
+      }
     } catch (error) {
       toast.error("failed to move");
       console.error("Move note failed:", error);
@@ -92,7 +104,7 @@ const EditorHeader = ({ note, setNote, triggerRefresh }: NoteEditorProps) => {
 
         <div className="border-b border-theme" />
 
-        <div className="flex flex-rowitems-start gap-2 pb-6">
+        <div className="flex flex-row items-start gap-2 pb-6">
           <Folder size={16} className="text-secondary mt-1" />
 
           <div className="flex flex-row gap-2">

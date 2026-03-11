@@ -19,7 +19,7 @@ const RecentsSection = () => {
   }, []);
 
   return (
-    <section className="mb-8">
+    <section className="pt-3 pr-3">
       <h2 className="text-xs uppercase mb-4 text-secondary pl-2">Recents</h2>
 
       <div className="flex flex-col gap-1 ">

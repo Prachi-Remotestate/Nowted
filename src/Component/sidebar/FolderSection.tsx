@@ -19,8 +19,8 @@ const FoldersSection = () => {
   }, []);
 
   return (
-    <section className="flex flex-col  mb-4">
-      <div className="flex justify-between items-center mb-4">
+    <section className="flex flex-col h-full">
+      <div className="flex justify-between items-center pb-4 pt-4">
         <h2 className="text-xs uppercase text-secondary pl-2">Folders</h2>
 
         <FolderPlus
@@ -29,9 +29,8 @@ const FoldersSection = () => {
           onClick={() => setIsCreatingFolder(true)}
         />
       </div>
-
-      <div className="flex flex-col gap-1 overflow-y-scroll overflow-x-hidden scrollbar-hide max-h-[30vh]">
-        {folders.map((folder: any) => (
+      <div className="flex flex-col gap-1 overflow-y-scroll overflow-x-hidden scrollbar-hide max-h-calc[(100vh-300px)]">
+        {folders.map((folder) => (
           <FolderItem
             key={folder.id}
             folder={folder}

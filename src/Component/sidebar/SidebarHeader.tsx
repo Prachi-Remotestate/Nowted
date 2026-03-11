@@ -9,7 +9,7 @@ const SidebarHeader = ({ setIsSearching }: Props) => {
   const { theme, setTheme } = useTheme();
 
   return (
-    <div className="flex items-center justify-between mb-8 pt-4">
+    <div className="flex items-center justify-between pt-1 pb-3">
       <div className="flex items-center gap-2 pl-3">
         <h1 className="text-xl font-semibold tracking-tight font-logo">
           Nowted

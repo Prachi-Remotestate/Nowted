@@ -31,7 +31,7 @@ type NoteContent = Omit<NotesAPIRes, "preview">
 
 
 export type getNotesRes = {
-    note: NoteContent;
+    notes: NoteContent;
 }
 
 export type AllNotes = {

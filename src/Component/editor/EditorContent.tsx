@@ -34,7 +34,6 @@ const EditorContent = ({ note, setNote, triggerRefresh }: NoteEditorProps) => {
         onChange={(e) => setContent(e.target.value)}
         onKeyDown={() => {
           keyCount.current += 1;
-
           if (keyCount.current >= 10) {
             updateNote(note.id, { content });
             keyCount.current = 0;
